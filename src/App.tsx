@@ -80,12 +80,20 @@ function Reset({setSquares, setTurn}:{setSquares:Function, setTurn: Function}){
 }
 
 function History({ history, setSquares, setTurn }: {history: Array<Array<string>>, setSquares: Function, setTurn: Function}){
+  function handleClick(squares: Array<String>, index: number){
+    setSquares(squares)
+    setTurn(index + 1)
+  }
+  
   return (
     <ol>
       {history.map((value, index) => {
-        return (
+        return(
           <li key={`history${index}`}>
-            <HistoryItem id={index} squareState={value} setSquares={setSquares} setTurn={setTurn} />
+          {/* //   <HistoryItem id={index} squareState={value} setSquares={setSquares} setTurn={setTurn} /> */}
+            <button onClick={() => handleClick(value, index)}>
+              {`Return to Turn ${index + 1}`}
+            </button>
           </li>
         )
       })}
@@ -93,18 +101,18 @@ function History({ history, setSquares, setTurn }: {history: Array<Array<string>
   )
 }
 
-function HistoryItem({ squareState, setSquares, id, setTurn}: {squareState: string[], setSquares: Function, id: number, setTurn: Function}){
-  function handleClick(){
-    setSquares(squareState)
-    setTurn(id + 1)
-  }
+// function HistoryItem({ squareState, setSquares, id, setTurn}: {squareState: string[], setSquares: Function, id: number, setTurn: Function}){
+//   function handleClick(){
+//     setSquares(squareState)
+//     setTurn(id + 1)
+//   }
 
-  return(
-    <button onClick={handleClick}>
-      {`Return to Turn ${id + 1}`}
-    </button>
-  )
-}
+//   return(
+//     <button onClick={handleClick}>
+//       {`Return to Turn ${id + 1}`}
+//     </button>
+//   )
+// }
 
 export default function Game(){
   const [turn, setTurn]: [number, Function] = useState(0)
