@@ -1,17 +1,30 @@
 
 async function main(){
-
-    const selectorPromise = new Promise<NodeListOf<Element> | string>((resolve, reject) => {
+    const squaresPromise = new Promise<NodeListOf<Element>>((resolve) => {
         setTimeout( (): void => {
             const squares:NodeListOf<Element> = document.querySelectorAll('.square')
-            if (squares)
-                resolve(squares)
-            reject('Err')
+            resolve(squares)
         }, 1000)
     })
 
-    const squares: NodeListOf<Element> | string = await selectorPromise
-    console.log(squares)
+    const squares: NodeListOf<Element> = await squaresPromise
+
+    const eventCodeToId = new Map([["Numpad7", 0], ["Numpad8", 1], ["Numpad9", 2], ["Numpad4", 3],
+        ["Numpad5", 4], ["Numpad6", 5], ["Numpad1", 6], ["Numpad2", 7], ["Numpad3", 8]
+    ])
+
+    document.addEventListener('keydown', (event) => {
+        if (event.code.startsWith('Numpad')){
+            const player:string | undefined = document.querySelector('section>section>strong')?.innerHTML
+            const id:number | undefined = eventCodeToId.get(event.code)
+
+            if (typeof id === 'number' && typeof player === "string"){
+                const square = squares[id]
+                if (!square.innerHTML)
+                    square.innerHTML = player
+            }
+        }
+    })
 }
 
 main()
