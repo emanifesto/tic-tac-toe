@@ -38,6 +38,7 @@ function Board({ squares, setSquares, turn, setTurn, player, winner, history, se
       setSquares(newSquares)
       
       const newHistory: string[][] = history.slice(0, turn)
+      newHistory.push(newSquares)
       setHistory(newHistory)
 
       setTurn(turn + 1)
