@@ -3,65 +3,45 @@
 /*disappearing inputs 3or4, 
 history only display to go back n moves,
 */
-//test regular ts files for numpad input event first
-
 import { useState, type ReactElement } from 'react'
 import './App.css'
 
-function Status({ turn, player, winner }: {turn: number, player: string, winner: string}){
-  let text: ReactElement<Element> = winner ? <>Winner is <strong>{winner}</strong></> : <>Turn {turn}: <strong>{player}</strong></>
-  return (
-      <section>
-        {text}
-      </section>
-  )
-}
-
-function Square({ id, value, handleClick }: {handleClick: Function, id: number, value: string}){
-  
-  const title: string = value ? `Filled: ${value}`: ""
+function Square({ player, squareClick }: {squareClick: any, player: string}){
+  const title: string = player ? `Filled: ${player}`: ""
 
   return(
-    <button className='square' title={title} onClick={() => handleClick(id)}>
-        {value}
+    <button className='square' title={title} onClick={squareClick}>
+        {player}
     </button>
   )
 }
 
-function Board({ squares, setSquares, turn, setTurn, player, winner, history, setHistory}: {squares: string[], setSquares: Function, turn: number, setTurn: Function, player: string, winner: string, history: string[][], setHistory: Function}){
-  const rows = [0, 3, 6]
+function Board({ squares, squareClick }: {squares: string[], squareClick: Function}){
+  const rows: number[] = [0, 1, 2]
 
-  async function handleClick(id: number){
-    if (!(squares[id] || winner)){
-      const newSquares: string[] = [...squares]
-      newSquares[id] = player
-      setSquares(newSquares)
-      
-      const newHistory: string[][] = history.slice(0, turn)
-      newHistory.push(newSquares)
-      setHistory(newHistory)
+  const createRow: Function = (row: number) => {
+    const startCol: number = row * 3
+    const endCol: number = startCol + 3
 
-      setTurn(turn + 1)
-    }
+    return(
+      squares.slice(startCol, endCol).map((player, index) => {
+        return (
+          <Square 
+            key={`S${row}-${index}`}
+            player={player}
+            squareClick={()  => squareClick(startCol + index)}
+          />
+        )
+      })
+    )
   }
 
   return (
     <figure>
       {rows.map((row) => {
         return (
-          <div key={`row${Math.floor(row/3)}`} className="board-row">
-            {
-              squares.slice(row, row + 3).map((value, index) => {
-                return (
-                  <Square 
-                    key={`square${Math.floor(row/3)}-${index}`}
-                    id={row + index}
-                    value={value}
-                    handleClick={handleClick}
-                  />
-                )
-              })
-            }
+          <div key={`R${row}`} className="board-row">
+            {createRow(row)}
           </div>
         )
       })}
@@ -69,32 +49,22 @@ function Board({ squares, setSquares, turn, setTurn, player, winner, history, se
   )
 }
 
-function Reset({setSquares, setTurn}:{setSquares:Function, setTurn: Function}){
+function Reset({ historyClick }: {historyClick:Function}){
   return(
-    <button onClick={() => {
-      setSquares(Array<string>(9).fill(""))
-      setTurn(0)
-    }}>
+    <button onClick={() => historyClick(Array<string>(9).fill(''), 0)}>
       Reset
     </button>
   )
 }
 
-function History({ history, setSquares, setTurn }: {history: Array<Array<string>>, setSquares: Function, setTurn: Function}){
-  function handleClick(squares: Array<String>, index: number){
-    setSquares(squares)
-    setTurn(index + 1)
-  }
-  
+function History({ history, historyClick}: {history: string[][], historyClick: Function}){
   return (
     <ol>
       {history.map((value, index) => {
+        const text: string = `Return to Turn ${index + 1}`
         return(
-          <li key={`history${index}`}>
-          {/* //   <HistoryItem id={index} squareState={value} setSquares={setSquares} setTurn={setTurn} /> */}
-            <button onClick={() => handleClick(value, index)}>
-              {`Return to Turn ${index + 1}`}
-            </button>
+          <li key={`H${index}`}>
+            <button onClick={() => historyClick(value, index)}>{text}</button>
           </li>
         )
       })}
@@ -102,25 +72,50 @@ function History({ history, setSquares, setTurn }: {history: Array<Array<string>
   )
 }
 
-// function HistoryItem({ squareState, setSquares, id, setTurn}: {squareState: string[], setSquares: Function, id: number, setTurn: Function}){
-//   function handleClick(){
-//     setSquares(squareState)
-//     setTurn(id + 1)
-//   }
-
-//   return(
-//     <button onClick={handleClick}>
-//       {`Return to Turn ${id + 1}`}
-//     </button>
-//   )
-// }
-
 export default function Game(){
   const [turn, setTurn]: [number, Function] = useState(0)
   const [squares, setSquares]: [string[], Function] = useState<string[]>(Array<string>(9).fill(''))
   const [history, setHistory]: [string[][], Function] = useState<string[][]>([])
   const player: string = turn % 2 == 0 ? 'X' : 'O'
-  function calcWinner(squares: string[]){
+  const winner = calcWinner(squares)
+
+  const statusText: ReactElement<Element> = winner ? <>Winner is <strong>{winner}</strong></> : <>Turn {turn}: <strong>{player}</strong></>
+
+  function squareClick(id: number){
+    if (squares[id] || winner)
+      return
+
+    const newSquares: string[] = [...squares]
+    newSquares[id] = player
+    setSquares(newSquares)
+    
+    const newHistory: string[][] = history.slice(0, turn)
+    newHistory.push(newSquares)
+    setHistory(newHistory)
+
+    setTurn(turn + 1)
+  }
+
+  function historyClick(squares: Array<String>, index: number){
+    setSquares(squares)
+    setTurn(index + 1)
+  }
+
+  return (
+    <main className="game">
+      <section>
+        <section className="status">{statusText}</section>
+        <Board squares={squares} squareClick={squareClick} />
+        <Reset historyClick={historyClick} />
+      </section>
+      <section>
+        <History history={history} historyClick={historyClick} />
+      </section>
+    </main>
+  )
+}
+
+function calcWinner(squares: string[]): string{
     const winConds : Array<Array<number>> = [
       [0, 1, 2], [0, 3, 6], [0, 4, 8],
       [1, 4, 7], [2, 4, 6], [2, 5, 8],
@@ -135,27 +130,3 @@ export default function Game(){
     }
     return ''
   }
-  const winner = calcWinner(squares)
-
-  return (
-    <main className="game">
-      <section>
-        <Status turn={turn} player={player} winner={winner}/>
-        <Board
-          squares={squares}
-          setSquares={setSquares}
-          turn={turn}
-          setTurn={setTurn}
-          player={player}
-          winner={winner}
-          history={history}
-          setHistory={setHistory}
-        />
-        <Reset setSquares={setSquares} setTurn={setTurn} />
-      </section>
-      <section>
-        <History history={history} setSquares={setSquares} setTurn={setTurn} />
-      </section>
-    </main>
-  )
-};
