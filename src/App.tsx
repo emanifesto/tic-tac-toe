@@ -51,7 +51,7 @@ function Board({ squares, squareClick }: {squares: string[], squareClick: Functi
 
 function Reset({ historyClick }: {historyClick:Function}){
   return(
-    <button onClick={() => historyClick(Array<string>(9).fill(''), 0)}>
+    <button onClick={() => historyClick(Array<string>(9).fill(''), -1)}>
       Reset
     </button>
   )
