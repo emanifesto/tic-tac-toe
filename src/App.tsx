@@ -49,13 +49,13 @@ function Board({ squares, squareClick }: {squares: string[], squareClick: Functi
   )
 }
 
-function Options({ historyClick, replayClick }: {historyClick:Function, replayClick: Function}){
+function Options({ historyClick, replayMoves }: {historyClick:Function, replayMoves: Function}){
   return(
     <div className="options">
       <button onClick={() => historyClick(Array<string>(9).fill(''), -1)}>
         Reset
       </button>
-      <button onClick={() => replayClick()}>
+      <button onClick={() => replayMoves()}>
         Replay
       </button>
     </div>
@@ -109,7 +109,7 @@ export default function Game(){
     setTurn(index + 1)
   }
 
-  function replayClick(){
+  function replayMoves(){
     if (history.length){
       lock.disableInput()
 
@@ -135,7 +135,7 @@ export default function Game(){
       <section>
         <section className="status">{statusText}</section>
         <Board squares={squares} squareClick={squareClick} />
-        <Options historyClick={historyClick} replayClick={replayClick} />
+        <Options historyClick={historyClick} replayMoves={replayMoves} />
       </section>
       <section>
         <History history={history} historyClick={historyClick} />
