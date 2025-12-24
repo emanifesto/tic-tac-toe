@@ -138,7 +138,8 @@ body {
   justify-items: center;
 }
 
-.restart {
-  margin: 10px 0 0 0;
-  display: block;
+.options {
+  display: flex;
+  margin-left: 24px;
+  column-gap: 10px;
 }

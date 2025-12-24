@@ -49,11 +49,16 @@ function Board({ squares, squareClick }: {squares: string[], squareClick: Functi
   )
 }
 
-function Reset({ historyClick }: {historyClick:Function}){
+function Options({ historyClick, replayClick }: {historyClick:Function, replayClick: Function}){
   return(
-    <button onClick={() => historyClick(Array<string>(9).fill(''), -1)}>
-      Reset
-    </button>
+    <div className="options">
+      <button onClick={() => historyClick(Array<string>(9).fill(''), -1)}>
+        Reset
+      </button>
+      <button onClick={() => replayClick()}>
+        Replay
+      </button>
+    </div>
   )
 }
 
@@ -77,12 +82,13 @@ export default function Game(){
   const [squares, setSquares]: [string[], Function] = useState<string[]>(Array<string>(9).fill(''))
   const [history, setHistory]: [string[][], Function] = useState<string[][]>([])
   const player: string = turn % 2 == 0 ? 'X' : 'O'
-  const winner = calcWinner(squares)
+  const winner: string = calcWinner(squares)
+  const lock = inputLock
 
   const statusText: ReactElement<Element> = winner ? <>Winner is <strong>{winner}</strong></> : <>Turn {turn}: <strong>{player}</strong></>
 
   function squareClick(id: number){
-    if (squares[id] || winner)
+    if (squares[id] || winner || lock.inputDisabled)
       return
 
     const newSquares: string[] = [...squares]
@@ -97,8 +103,31 @@ export default function Game(){
   }
 
   function historyClick(squares: Array<String>, index: number){
+    if (lock.inputDisabled)
+      return
     setSquares(squares)
     setTurn(index + 1)
+  }
+
+  function replayClick(){
+    if (history.length){
+      lock.disableInput()
+
+      setSquares(Array<string>(9).fill(''))
+      let current: number = 0
+      const end: number = history.length
+
+      const replayInterval = setInterval(() => {
+        if (current == end){
+          clearInterval(replayInterval)
+          lock.enableInput()
+          return
+        }
+
+        setSquares(history[current])
+        current++
+      }, 600)
+    }
   }
 
   return (
@@ -106,7 +135,7 @@ export default function Game(){
       <section>
         <section className="status">{statusText}</section>
         <Board squares={squares} squareClick={squareClick} />
-        <Reset historyClick={historyClick} />
+        <Options historyClick={historyClick} replayClick={replayClick} />
       </section>
       <section>
         <History history={history} historyClick={historyClick} />
@@ -130,3 +159,14 @@ function calcWinner(squares: string[]): string{
     }
     return ''
   }
+
+interface inputLock{
+  inputDisabled: boolean
+  enableInput: Function
+  disableInput: Function
+}
+const inputLock: inputLock = {
+  inputDisabled: false,
+  enableInput():void{this.inputDisabled = false},
+  disableInput(): void{this.inputDisabled = true},
+}
