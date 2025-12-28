@@ -1,4 +1,3 @@
-//play through history with setInterval
 //map number pad to squares for easier play
 /*disappearing inputs 3or4, 
 history only display to go back n moves,
@@ -86,6 +85,20 @@ export default function Game(){
   const lock = inputLock
 
   const statusText: ReactElement<Element> = winner ? <>Winner is <strong>{winner}</strong></> : <>Turn {turn}: <strong>{player}</strong></>
+
+  document.addEventListener('keydown', (event:KeyboardEvent): void => {
+    if (event.code.startsWith('Numpad')){
+      const calcNumpadIdToSquareId = (numpadId: number): number => {
+        return (numpadId + 5) - (6 * Math.floor((numpadId - 1) / 3))
+      }
+      const numpadId: number = Number(event.code[6])
+      const squareId: number = calcNumpadIdToSquareId(numpadId)
+
+      console.log(squares)
+      squareClick(squareId)
+      // console.log(event)
+    }
+  })
 
   function squareClick(id: number){
     if (squares[id] || winner || lock.inputDisabled)
