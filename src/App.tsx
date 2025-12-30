@@ -91,7 +91,7 @@ export default function Game(){
     return () => {
       document.removeEventListener('keydown', handleKeyDown)
     }
-  }, [])
+  }, [squares])
 
   function handleKeyDown(event: KeyboardEvent): void{
     if (event.code.startsWith('Numpad')){
