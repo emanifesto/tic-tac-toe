@@ -1,3 +1,4 @@
+//make replay quickly go through in reverse order before inorder
 //let replay reset to the state of squares before it was clicked, be interruptible to pause on a state
 //map back 1 move('backspace'?), history button items, and reset button to keyboard('0'?)
 //disappearing inputs 3or4, history only display to go back n moves
