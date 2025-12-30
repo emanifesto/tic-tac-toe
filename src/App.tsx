@@ -2,7 +2,7 @@
 /*disappearing inputs 3or4, 
 history only display to go back n moves,
 */
-import { useState, type ReactElement } from 'react'
+import { useState, useEffect, type ReactElement } from 'react'
 import './App.css'
 
 function Square({ player, squareClick }: {squareClick: any, player: string}){
@@ -86,7 +86,14 @@ export default function Game(){
 
   const statusText: ReactElement<Element> = winner ? <>Winner is <strong>{winner}</strong></> : <>Turn {turn}: <strong>{player}</strong></>
 
-  document.addEventListener('keydown', (event:KeyboardEvent): void => {
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [])
+
+  function handleKeyDown(event: KeyboardEvent): void{
     if (event.code.startsWith('Numpad')){
       const calcNumpadIdToSquareId = (numpadId: number): number => {
         return (numpadId + 5) - (6 * Math.floor((numpadId - 1) / 3))
@@ -94,11 +101,9 @@ export default function Game(){
       const numpadId: number = Number(event.code[6])
       const squareId: number = calcNumpadIdToSquareId(numpadId)
 
-      console.log(squares)
       squareClick(squareId)
-      // console.log(event)
     }
-  })
+  }
 
   function squareClick(id: number){
     if (squares[id] || winner || lock.inputDisabled)
@@ -110,7 +115,7 @@ export default function Game(){
     
     const newHistory: string[][] = history.slice(0, turn)
     newHistory.push(newSquares)
-    setHistory(newHistory)
+     setHistory(newHistory)
 
     setTurn(turn + 1)
   }
