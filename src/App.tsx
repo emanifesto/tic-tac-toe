@@ -1,7 +1,10 @@
-//map number pad to squares for easier play
-/*disappearing inputs 3or4, 
-history only display to go back n moves,
-*/
+//let replay reset to the state of squares before it was clicked, be interruptible to pause on a state
+//map back 1 move('backspace'?), history button items, and reset button to keyboard('0'?)
+//disappearing inputs 3or4, history only display to go back n moves
+//Highlight winning moves
+//music?
+//css updates PLS
+
 import { useState, useEffect, type ReactElement } from 'react'
 import './App.css'
 
